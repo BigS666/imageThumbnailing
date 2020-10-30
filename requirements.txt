@@ -6,3 +6,6 @@
 flask >= 1.1.2              # Lighweight web application server for python
 Pillow >= 8.0.1             # For image manipulation, thumbnailing
 pytest == 6.1.2             # To run imageThumbnailling tests cases
+
+celery == 5.0.1             # Needed to queue image thumbnailing
+redis == 3.5.3              # Used to store celery queue info
