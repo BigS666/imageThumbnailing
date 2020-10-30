@@ -23,7 +23,7 @@ def soumissionImage():
 def litesImages():
     """ Lists all the stockedimages
 
-    >>> curl UPLOAD_ADDRESS/images
+    >>> curl http://127.0.0.1:5000/images
     {{id:42,thumbadress:'UPLOAD_ADDRESS/thumbnails/42.jpg'}}
     """
     params=request.args
@@ -54,6 +54,6 @@ def getThumbnail(thumbnail_id):
     >>> curl UPLOAD_ADDRESS/thumbnails/42.jpg
     <img  src="thumbnails/42.jpg">
     """
-    lienversimage = '<img src="thumbnails/'+thumbnail_id+'.jpg">'
+    lienversimage = '<img src="../thumbnails/'+str(thumbnail_id)+'.jpg">'
 
     return lienversimage
