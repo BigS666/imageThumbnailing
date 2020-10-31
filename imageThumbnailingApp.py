@@ -1,8 +1,14 @@
+import os
+import io
 from flask import Flask
 import json
 from flask import jsonify
 from flask import request
+from flask import Response
+from flask import send_file
+from flask import send_from_directory
 import imageWorking
+import dbscripts.crudDb
 
 app = Flask(__name__)
 
@@ -29,6 +35,9 @@ def soumissionImage():
         return 'No file selected (name empty)'
 
     thubnailedImg = imageWorking.thumbnailing(file)
+
+    
+    #thubnailedImg.save(os.path('static'))
 
 
     return retour
@@ -65,9 +74,10 @@ def infoImage(image_id):
 def getThumbnail(thumbnail_id):
     """ read the requested generated thumbnail
 
-    >>> curl UPLOAD_ADDRESS/thumbnails/42.jpg
-    <img  src="static/42.jpg">
+    >>> curl http://127.0.0.1:5000/thumbnails/42.jpg
+    <img style="-webkit-user-select: none;margin: auto;" src="http://127.0.0.1:5000/thumbnails/42.jpg">
     """
-    lienversimage = '<img src="../static/'+str(thumbnail_id)+'.jpg">'
 
-    return lienversimage
+    name =  str(thumbnail_id) + ".jpg"
+
+    return send_from_directory("static/", name)
