@@ -2,6 +2,7 @@ from flask import Flask
 import json
 from flask import jsonify
 from flask import request
+import imageWorking
 
 app = Flask(__name__)
 
@@ -9,18 +10,31 @@ app = Flask(__name__)
 def soumissionImage():
     """ upload a new image, responds an image ID
 
-    >>> curl -F ‘data=@path/to/local/file’ UPLOAD_ADDRESS/images
-    42
+    >> Windows
+    >>> curl -F ‘mydata=testFile.txt’ http://127.0.0.1:5000/images \n
+    >> Unix / mac
+    >>> curl -F ‘mydata=@path/to/local/file’ http://127.0.0.1:5000/images \n
+    >{id:42}
     """
-    params=request.form['']
+    retour =''
 
-    retour = params
-    print(retour)
+    #testing existance of 'mydata' as attached file to upload
+    if 'mydata' not in request.files:
+        return "No selected 'mydata' File to upload"
+    
+    file = request.files['mydata']
+
+    #testing filname not empty
+    if file.filename == '':
+        return 'No file selected (name empty)'
+
+    thubnailedImg = imageWorking.thumbnailing(file)
+
 
     return retour
 
 @app.route('/images', methods=['GET'])
-def litesImages():
+def listImages():
     """ Lists all the stockedimages
 
     >>> curl http://127.0.0.1:5000/images
@@ -38,7 +52,7 @@ def infoImage(image_id):
     """ describe image processing state (pending, success, failure) metadata and links to thumbnail
 
     >>> curl UPLOAD_ADDRESS/images/42
-    {{id:42,state:success,thumbadress:'UPLOAD_ADDRESS/thumbnails/42.jpg'}}
+    {{id:42,state:success,metadatas:{},thumbadress:'http://127.0.0.1:5000/thumbnails/42.jpg'}}
     """
     params=request.args
 
@@ -52,8 +66,8 @@ def getThumbnail(thumbnail_id):
     """ read the requested generated thumbnail
 
     >>> curl UPLOAD_ADDRESS/thumbnails/42.jpg
-    <img  src="thumbnails/42.jpg">
+    <img  src="static/42.jpg">
     """
-    lienversimage = '<img src="../thumbnails/'+str(thumbnail_id)+'.jpg">'
+    lienversimage = '<img src="../static/'+str(thumbnail_id)+'.jpg">'
 
     return lienversimage
