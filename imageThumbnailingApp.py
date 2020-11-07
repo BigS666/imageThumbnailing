@@ -16,11 +16,8 @@ app = Flask(__name__)
 def soumissionImage():
     """ upload a new image, responds an image ID
 
-    >> Windows
-    >>> curl -F ‘mydata=testFile.txt’ http://127.0.0.1:5000/images \n
-    >> Unix / mac
-    >>> curl -F ‘mydata=@path/to/local/file’ http://127.0.0.1:5000/images \n
-    >{id:42}
+    >>> curl -F mydata=@Capture.PNG http://127.0.0.1:5000/images \n
+    >{"id":42}
     """
     retour =''
 
@@ -34,11 +31,22 @@ def soumissionImage():
     if file.filename == '':
         return 'No file selected (name empty)'
 
-    thubnailedImg = imageWorking.thumbnailing(file)
+    #Obtention du prochain id disponnible
+    id = dbscripts.crudDb.getNextId()
 
-    
-    #thubnailedImg.save(os.path('static'))
+    if(type(id) == int):
 
+        dbscripts.crudDb.saveImage(id,'pending',imageWorking.getAllInfo(file))
+
+        #miniaturisation
+        thubnailedImg = imageWorking.thumbnailing(file)
+
+        #enregistrement de l'image
+        thubnailedImg.save("static/"+ str(id) + ".jpg","JPEG")
+
+        retour = '{"id":'+str(id)+'}'
+    else :
+        return ("erreur interne")
 
     return retour
 
@@ -47,28 +55,26 @@ def listImages():
     """ Lists all the stockedimages
 
     >>> curl http://127.0.0.1:5000/images
-    {{id:42,thumbadress:'UPLOAD_ADDRESS/thumbnails/42.jpg'}}
+    {{id:42,metadatas:{},thumbadress:'http://127.0.0.1:5000/thumbnails/42.jpg'}}
     """
+    #TODO
     params=request.args
 
     retour = params
     print(retour)
 
-    return jsonify(retour)
+    return retour
 
 @app.route('/images/<int:image_id>', methods=['GET'])
 def infoImage(image_id):
     """ describe image processing state (pending, success, failure) metadata and links to thumbnail
 
-    >>> curl UPLOAD_ADDRESS/images/42
-    {{id:42,state:success,metadatas:{},thumbadress:'http://127.0.0.1:5000/thumbnails/42.jpg'}}
+    >>> curl http://127.0.0.1:5000/images/42
+    {{"state":success,"metadatas":{},"link":'http://127.0.0.1:5000/thumbnails/42.jpg'}}
     """
-    params=request.args
+    retour = dbscripts.crudDb.getImage(image_id)
 
-    retour = params
-    print(retour)
-
-    return jsonify(retour)
+    return retour
 
 @app.route('/thumbnails/<int:thumbnail_id>.jpg', methods=['GET'])
 def getThumbnail(thumbnail_id):
