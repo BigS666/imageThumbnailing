@@ -55,7 +55,8 @@ def listImages():
     """Lists all the stockedimages
 
     >>> curl http://127.0.0.1:5000/images
-    {{id:42,metadatas:{},thumbadress:'http://127.0.0.1:5000/thumbnails/42.jpg'}}
+    {{"state":success,"metadatas":{},"link":'http://127.0.0.1:5000/images/1.jpg'},
+    {"state":success,"metadatas":{},"link":'http://127.0.0.1:5000/images/2.jpg'}}
     """
     retour = dbscripts.crudDb.getAllImages()
 
@@ -67,7 +68,7 @@ def infoImage(image_id):
     """describe image processing state (pending, success, failure) metadata and links to thumbnail
 
     >>> curl http://127.0.0.1:5000/images/42
-    {"state":success,"metadatas":{},"link":'http://127.0.0.1:5000/thumbnails/42.jpg'}
+    {"state":success,"metadatas":{},"link":'http://127.0.0.1:5000/images/42.jpg'}
     """
     #recherche en base les donnees de l'image souhaitee
     retour = dbscripts.crudDb.getImage(image_id)
@@ -75,12 +76,12 @@ def infoImage(image_id):
     return retour
 
 
-@app.route("/thumbnails/<int:thumbnail_id>.jpg", methods=["GET"])
+@app.route("/thumnails/<int:thumbnail_id>.jpg", methods=["GET"])
 def getThumbnail(thumbnail_id):
     """read the requested generated thumbnail
 
-    >>> curl http://127.0.0.1:5000/thumbnails/42.jpg
-    <img style="-webkit-user-select: none;margin: auto;" src="http://127.0.0.1:5000/thumbnails/42.jpg">
+    >>> curl http://127.0.0.1:5000/thumnails/9
+    <img style="-webkit-user-select: none;margin: auto;" src="http://127.0.0.1:5000/thumnails/42.jpg">
     """
     #construction du nom du fichier correspondant a l'id souhaite
     name = str(thumbnail_id) + ".jpg"
