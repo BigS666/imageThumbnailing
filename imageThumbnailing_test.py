@@ -1,6 +1,8 @@
 from imageThumbnailingApp import app
 import re
 import dbscripts.crudDb
+from PIL import Image
+import io
 
 
 def testPost():
@@ -10,25 +12,16 @@ def testPost():
     """
     with app.test_client() as c:
 
+        #image de test presente dans le repertoire
         image = "Capture.PNG"
         data = {"mydata": (open(image, "rb"), image)}
+        #on post l'image
         rv = c.post("/images", data=data)
         body = rv.data
+        #atterne de verification du retour de l'api
         pattern = re.compile('{"id":.*}')
-        print(body.decode("utf-8"))
-        result = False
-        if pattern.match(body.decode("utf-8")):
-            result = True
-        assert result
-
-
-def getThumnails():
-    with app.test_client() as c:
-        rv = c.get("/thumbnails/3")
-        body = rv.data
-        open(body, "rb")
-        assert body == '<img src="thumbnails/42.jpg">'
-
+        #le retour respecte bien la pattern d'une reponse attendue
+        assert pattern.match(body.decode("utf-8"))
 
 def testSupprLastIamge():
     """
@@ -47,13 +40,28 @@ def testSupprLastIamge():
 def testImageList():
     """
     Ce test vérifie que l'appel a l'api de listing des images fonctionne.
-    Le retour contient un element "state"
+    Le retour de l'api contient un element "state"
     """
     with app.test_client() as c:
+        #appel de l'api de listing
         rv = c.get("/images")
         json_data = rv.data
+        #patterne d'une reponse simple correctement formee
         pattern = re.compile('.*"state":.*')
-        result = False
-        if pattern.match(json_data.decode("utf-8")):
-            result = True
-        assert result
+        assert pattern.match(json_data.decode("utf-8"))
+
+def testGetThumnail():
+    """
+    Ce test vérifie que l'appel a l'api de récupération de miniature fonctionne
+    Le retour de l'api est une image 
+    """
+    with app.test_client() as c:
+        #appel de l'api de recuperation de miniature
+        rv = c.get("/thumnails/3.jpg")
+        body = rv.data
+        #on construit l'image a partir des bytes retournes
+        im = Image.open(io.BytesIO(body))
+        #on construit l'image depuis le repertoir
+        image2 = Image.open("static/3.jpg")
+        #on compare que l'image du repertoire est celle retournée par l'api
+        assert im == image2
