@@ -5,10 +5,34 @@ import os
 from flask import (Flask, Response, jsonify, request, send_file,
                    send_from_directory)
 
+from flask_swagger_ui import get_swaggerui_blueprint
+from flask_swagger import swagger
+
 import dbscripts.crudDb
 import imageWorking
 
 app = Flask(__name__)
+
+
+@app.route("/spec")
+def spec():
+    swag = swagger(app)
+    swag['info']['version'] = "1.0"
+    swag['info']['title'] = "My API"
+    return jsonify(swag)
+
+### swagger specific ###
+SWAGGER_URL = '/swagger'
+API_URL = '/static/swagger.json'
+SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name': "Miniaturiseur d'image"
+    }
+)
+app.register_blueprint(SWAGGERUI_BLUEPRINT, url_prefix=SWAGGER_URL)
+### end swagger specific ###
 
 
 @app.route("/images", methods=["POST"])

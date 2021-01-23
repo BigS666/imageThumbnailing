@@ -9,5 +9,8 @@ pytest == 6.1.2             # To run imageThumbnailling tests cases
 
 celery == 5.0.1             # Needed to queue image thumbnailing
 redis == 3.5.3              # Used to store celery queue info
-coverage-5.3.1              # test coverage
-pytest-cov-2.11.1           # test coverage with pytest
+coverage >= 5.3.1              # test coverage
+pytest-cov >= 2.11.1           # test coverage with pytest
+PyYAML == 5.4.1                 # in order to deal with yaml description
+flask-swagger == 0.2.14         # test auto generated swagger file from yaml description methods
+flask-swagger-ui == 3.36.0      # flask swagger ui to explore the image thumbnailing api
